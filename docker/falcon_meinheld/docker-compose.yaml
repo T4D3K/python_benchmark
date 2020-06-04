@@ -1,0 +1,21 @@
+version: '2.4'
+services:
+  api:
+    image: "falcon_app"
+    cpus: 0.1
+    depends_on:
+      - db
+    command: "gunicorn -b 0.0.0.0:8000 --worker-tmp-dir /dev/shm --workers=2 --worker-class=meinheld.gmeinheld.MeinheldWorker falcon_frm.app:app"
+    environment:
+      DB_POOL_SIZE: 100
+
+  db:
+    image: "postgres"
+
+  wrk:
+    image: "skandyla/wrk"
+    depends_on:
+      - api
+    volumes:
+      - ../../:/benchmark
+    command: "-t5 -c10 -d30 http://api:8000/hello"
