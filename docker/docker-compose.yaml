@@ -1,0 +1,64 @@
+version: '2.4'
+services:
+  api1:
+    image: "falcon_app"
+    cpus: 0.1
+    depends_on:
+      - db
+    environment:
+      DB_POOL_SIZE: 5
+    command: >
+      /bin/bash -c "
+        sleep 2;
+        gunicorn -b 0.0.0.0:8000 --worker-tmp-dir /dev/shm --workers=2 --worker-class=gunicorn.workers.ggevent.GeventWorker falcon_frm.app:app
+      "
+
+  api2:
+    image: "falcon_app"
+    cpus: 0.1
+    depends_on:
+      - db
+    environment:
+      DB_POOL_SIZE: 5
+    command: >
+      /bin/bash -c "
+        sleep 5;
+        gunicorn -b 0.0.0.0:8000 --worker-tmp-dir /dev/shm --workers=2 falcon_frm.app:app
+      "
+
+
+  api3:
+    image: "falcon_app"
+    cpus: 0.1
+    depends_on:
+      - db
+    command: >
+      /bin/bash -c "
+        sleep 5;
+        gunicorn -b 0.0.0.0:8000 --worker-tmp-dir /dev/shm --workers=2 --worker-class=meinheld.gmeinheld.MeinheldWorker falcon_frm.app:app
+      "
+
+    environment:
+      DB_POOL_SIZE: 5
+
+  api4:
+    image: "fastapi_frm"
+    cpus: 0.1
+    depends_on:
+      - db
+    environment:
+      DB_POOL_SIZE: 5
+    command: >
+      /bin/bash -c "
+        sleep 5;
+        uvicorn --host 0.0.0.0 --port 8000 --workers 2 fastapi_frm.app:app --no-access-log
+      "
+
+  db:
+    image: "postgres"
+
+  wrk:
+    image: "skandyla/wrk"
+    volumes:
+      - ../:/benchmark
+    command: "exit"

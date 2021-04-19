@@ -1,0 +1,13 @@
+falcon
+fastapi
+sqlalchemy
+tortoise-orm
+asyncpg
+gunicorn
+uvicorn
+locust
+psycopg2-binary
+meinheld
+gunicorn[gevent]
+gino[starlette]
+
